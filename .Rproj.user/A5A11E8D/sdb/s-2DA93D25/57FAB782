@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#### data cleaning ####\n\n#' Data cleaning function. Reads raw NOAA earthquake data and returns clean dataframe.\n#'\n#' @param data a .txt file contianin NOAA earthquake data\n#'\n#' @importFrom readr read_tsv()\n#' @importFrom chron julian\n#' @importFrom dlpyr %>%\n#'\n#' @export\n\neq_clean_dat <- function(data){\n  raw_df <- readr::read_tsv(data)\n  raw_df$MONTH <- replace(raw_df$MONTH,is.na(raw_df$MONTH),\"01\") %>% as.numeric()\n  raw_df$DAY <- replace(raw_df$DAY,is.na(raw_df$DAY),\"01\") %>% as.numeric()\n  raw_df$Date <- chron::julian(raw_df$MONTH, raw_df$DAY, raw_df$YEAR) %>% as.Date(origin = \"1970-01-01\")\n  return(raw_df)\n}\n\n#' Function to clean location column\n#'\n#' @param df a dataframe of NOAA earthquake data\n#'\n#' @importFrom dplyr %>% bind_rows filter mutate\n#' @importFrom tidyr separate\n#' @importFrom tools toTitleCase\n#'\n#' @export\n\neq_location_clean <- function(df){\n  df_clean <- df %>% tidyr::separate(LOCATION_NAME, into = c(\"country\",\"Location\"), sep = \":\", remove = FALSE)\n  df_na <- df_clean %>% dplyr::filter(is.na(Location)) %>% dplyr::mutate(Location = country)\n  df_remain <- df_clean %>% dplyr::filter(!is.na(Location))\n  df_all <- dplyr::bind_rows(df_na, df_remain)\n  df_all$Location <- lapply(df_all$Location, tolower)\n  df_all$Location <- lapply(df_all$Location, tools::toTitleCase)\n  return(df_all)\n}\n\n### custom geoms ###\n\n#' geom_timeline creates earthquake timeline\n#'\n\n\n\n#' geom_timeline_label creates labels for earthquake timeline\n",
+    "created" : 1523926055032.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3619784355",
+    "id" : "57FAB782",
+    "lastKnownWriteTime" : 1527000842,
+    "last_content_update" : 1527000842704,
+    "path" : "~/GitHub/capstone/R/quakes.R",
+    "project_path" : "R/quakes.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
